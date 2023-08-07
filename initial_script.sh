@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# More info: 
+# More info:
 # https://github.com/Yordanofff/rPi-USB-mass-storage-device-emulator/
 # Todo: The service doesn't work at all if the ExecStop script is uncommented. Run it manually if needed.
 
@@ -19,7 +19,7 @@ read -r -p $'\nThe script is starting.. \nPress any key to continue or [Ctrl + C
 ########################################################################
 SCRIPTS_FOLDER_LOCATION="/scripts"
 if [ ! -e "$SCRIPTS_FOLDER_LOCATION" ]; then
-	mkdir "$SCRIPTS_FOLDER_LOCATION"
+    mkdir "$SCRIPTS_FOLDER_LOCATION"
 fi
 
 ########################################################################
@@ -30,12 +30,12 @@ fi
 check_and_append_line() {
     local file_path="$1"
     local line_to_append="$2"
-
+    
     # Check if the line already exists in the file
     if grep -qF "$line_to_append" "$file_path"; then
-		echo "Line \"$line_to_append\" already in \"$file_path\"."
-	else
-		# Append the line only if it doesn't exist
+        echo "Line \"$line_to_append\" already in \"$file_path\"."
+    else
+        # Append the line only if it doesn't exist
         echo "$line_to_append" | sudo tee -a "$file_path"
         echo "Line \"$line_to_append\" appended successfully to \"$file_path\"."
     fi
@@ -45,7 +45,7 @@ check_and_append_line() {
 create_backup() {
     local file_path="$1"
     local backup_file="${file_path}.backup"
-
+    
     if [ ! -f "$backup_file" ]; then
         cp "$file_path" "$backup_file"
         echo "Backup created for \"$file_path\" as \"$backup_file\"."
@@ -58,30 +58,30 @@ create_backup() {
 files_and_lines=(
     "/etc/modules:dwc2"
     "/etc/modules:libcomposite"
-	"/boot/config.txt:dtoverlay=dwc2"
+    "/boot/config.txt:dtoverlay=dwc2"
 )
 
 # Loop through the array and call the functions for each entry
 for item in "${files_and_lines[@]}"; do
     file_path="${item%%:*}"
     line_to_append="${item##*:}"
-	
-	create_backup "$file_path"
+    
+    create_backup "$file_path"
     check_and_append_line "$file_path" "$line_to_append"
 done
 
 # Load the g_mass_storage kernel module if not loaded. /sys/kernel/config/usb_gadget/ should exist.
 USB_GADGET_FILE_LOCATION="/sys/kernel/config/usb_gadget/"
 if [ ! -e "$USB_GADGET_FILE_LOCATION" ]; then
-	echo "$USB_GADGET_FILE_LOCATION is missing. Loading the \"g_mass_storage\" kernel module.."
-	modprobe g_mass_storage
+    echo "$USB_GADGET_FILE_LOCATION is missing. Loading the \"g_mass_storage\" kernel module.."
+    modprobe g_mass_storage
 fi
 
 if [ ! -e "$USB_GADGET_FILE_LOCATION" ]; then
-	echo -e "ERROR: $USB_GADGET_FILE_LOCATION is still missing. \nTry loading the kernel module manually using \"modprobe g_mass_storage\".\nCheck if loadead using \"lsmod | grep g_mass_storage\""
-	exit 1
+    echo -e "ERROR: $USB_GADGET_FILE_LOCATION is still missing. \nTry loading the kernel module manually using \"modprobe g_mass_storage\".\nCheck if loadead using \"lsmod | grep g_mass_storage\""
+    exit 1
 else
-	echo "Kernel module loaded successfully."
+    echo "Kernel module loaded successfully."
 fi
 
 ########################################################################
@@ -94,18 +94,18 @@ DISK_BLOCK_SIZE_IN_BYTES=1024
 DISK_SIZE_IN_MB=100
 
 if [ -e "$DISK_FILE_LOCATION" ]; then
-	echo "Disk dile already exists and won't be recreated - \"$DISK_FILE_LOCATION\""
-	echo "Get the data out and delete the file manually (rm $DISK_FILE_LOCATION) if you wish to re-create it."
+    echo "Disk dile already exists and won't be recreated - \"$DISK_FILE_LOCATION\""
+    echo "Get the data out and delete the file manually (rm $DISK_FILE_LOCATION) if you wish to re-create it."
 else
-	echo "Disk file doesn't exist and will be created at \"$DISK_FILE_LOCATION\""
-	
-	# Disk size = block size * num blocks. /1024*1024 = 1MB/
-	DISK_NUMBER_OF_BLOCKS=$(("$DISK_SIZE_IN_MB"*1024*1024/"$DISK_BLOCK_SIZE_IN_BYTES"))
-	
-	dd if=/dev/zero of="$DISK_FILE_LOCATION" bs="$DISK_BLOCK_SIZE_IN_BYTES" count="$DISK_NUMBER_OF_BLOCKS"
-	mkdosfs "$DISK_FILE_LOCATION"
-	
-	echo "Disk file created. Size: $DISK_SIZE_IN_MB Mb. Block size: $DISK_BLOCK_SIZE_IN_BYTES bytes."
+    echo "Disk file doesn't exist and will be created at \"$DISK_FILE_LOCATION\""
+    
+    # Disk size = block size * num blocks. /1024*1024 = 1MB/
+    DISK_NUMBER_OF_BLOCKS=$(("$DISK_SIZE_IN_MB"*1024*1024/"$DISK_BLOCK_SIZE_IN_BYTES"))
+    
+    dd if=/dev/zero of="$DISK_FILE_LOCATION" bs="$DISK_BLOCK_SIZE_IN_BYTES" count="$DISK_NUMBER_OF_BLOCKS"
+    mkdosfs "$DISK_FILE_LOCATION"
+    
+    echo "Disk file created. Size: $DISK_SIZE_IN_MB Mb. Block size: $DISK_BLOCK_SIZE_IN_BYTES bytes."
 fi
 
 
@@ -128,8 +128,8 @@ MASS_DESCRIPTION="JetFlash"  # The device will show up as "Linux File-Stor Gadge
 
 # Create the script file and make it executable if it doesn't exist (first run)
 if [ ! -e "$START_SCRIPT_FULL_PATH" ]; then
-	touch "$START_SCRIPT_FULL_PATH"
-	chmod +x "$START_SCRIPT_FULL_PATH" #make it executable
+    touch "$START_SCRIPT_FULL_PATH"
+    chmod +x "$START_SCRIPT_FULL_PATH" #make it executable
 fi
 
 # Populate the script and save it
@@ -189,7 +189,7 @@ ls /sys/class/udc > UDC
 EOF
 
 ########################################################################
-# Create stop script - will unmount the device (not safe) from PC, so the USB details 
+# Create stop script - will unmount the device (not safe) from PC, so the USB details
 # can be changed and the start script can be re-run without restarting the rPi
 ########################################################################
 STOP_SCRIPT_NAME="stop_script"
@@ -197,18 +197,18 @@ STOP_SCRIPT_FULL_PATH="$SCRIPTS_FOLDER_LOCATION/${STOP_SCRIPT_NAME}"
 
 # Create the script file and make it executable if it doesn't exist (first run)
 if [ ! -e "$STOP_SCRIPT_FULL_PATH" ]; then
-	touch "$STOP_SCRIPT_FULL_PATH"
-	chmod +x "$STOP_SCRIPT_FULL_PATH" #make it executable
+    touch "$STOP_SCRIPT_FULL_PATH"
+    chmod +x "$STOP_SCRIPT_FULL_PATH" #make it executable
 fi
 
 cat <<EOF > "$STOP_SCRIPT_FULL_PATH"
 #!/bin/bash
 
-# This script will force unmount the mass storage device from the computer (NOT safe removal - 
-# any data transfers will fail and data may become corrupted.) 
-# 
+# This script will force unmount the mass storage device from the computer (NOT safe removal -
+# any data transfers will fail and data may become corrupted.)
+#
 # To be run when changes to the USB drive description are needed (to be made in the start script)
-# 
+#
 # No data in the usb drive (img file) will be lost - so the "new" device will have the "old" data.
 
 
@@ -241,7 +241,7 @@ EOF
 SERVICE_NAME="my_service.service"
 SERVICE_FILE_LOCATION="/etc/systemd/system/$SERVICE_NAME"
 if [ ! -e "$SERVICE_FILE_LOCATION" ]; then
-	touch "$SERVICE_FILE_LOCATION"
+    touch "$SERVICE_FILE_LOCATION"
 fi
 
 # Populate the service:
@@ -254,7 +254,7 @@ After=network.target
 Type=simple
 User=root
 ExecStart=$START_SCRIPT_FULL_PATH
-#ExecStop=$STOP_SCRIPT_FULL_PATH       
+#ExecStop=$STOP_SCRIPT_FULL_PATH
 RemainAfterExit=true                   # Keep the service active after the main process exits
 
 [Install]
