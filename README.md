@@ -18,7 +18,7 @@ Semi-auto steps:
 Enter this and **paste** the content of the script in the text window. (To save and exit use **[Ctrl + X] -> Y -> Enter**)
 The script will start automatically and will ask the user to continue the execution or to stop it.
 
-**sudo mkdir /scripts && cd "$_" && sudo touch initial_script.sh && sudo chmod +x "$_" && sudo nano "$_" && sudo /scripts/"$_"**
+**sudo mkdir /scripts && cd "$\_" && sudo touch initial_script.sh && sudo chmod +x "$\_" && sudo nano "$\_" && sudo /scripts/"$\_"**
 
 
 Manual steps:
