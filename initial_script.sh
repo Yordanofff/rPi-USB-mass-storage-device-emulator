@@ -142,7 +142,7 @@ cat <<EOF > "$START_SCRIPT_FULL_PATH"
 
 
 # Check if the user running the script is root
-if [ "$EUID" -ne 0 ]; then
+if [ "\$EUID" -ne 0 ]; then
     echo "ERROR: This script must be run as root. Please use sudo or run as root user."
     exit 1
 fi
